@@ -1,13 +1,14 @@
 from __future__ import annotations
-
 from typing import Any
+from astrbot.api.event import Star  # 确保导入了基类
 
-
-class IdentityNamePlugin:
+class IdentityNamePlugin(Star):
     """AstrBot 插件：在 LLM 聊天前注入稳定身份锚点，减少认错人。"""
 
-    def __init__(self, ctx: Any = None) -> None:
-        self.ctx = ctx
+    def __init__(self, context: Any = None, **kwargs) -> None:
+        # 修复 unexpected keyword argument 'context' 报错
+        super().__init__(context)
+        self.context = context
 
     def _pick_first(self, obj: dict[str, Any], keys: list[str]) -> Any:
         for key in keys:
@@ -65,4 +66,5 @@ class IdentityNamePlugin:
             "当对话出现身份冲突或信息不足时，先澄清身份再继续回答。"
         )
 
+        # 返回修改后的消息列表
         return [{"role": "system", "content": system_prompt}, *messages]
