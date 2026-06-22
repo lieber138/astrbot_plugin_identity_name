@@ -48,4 +48,12 @@ class IdentityNamePlugin(Star):
         else:
             messages.insert(0, {"role": "system", "content": identity_instr})
 
+        # 4. 截断对话历史，防止上下文过长导致连接失败
+        # 保留所有 system 消息 + 最近 MAX_TURNS 条非 system 消息
+        MAX_TURNS = 20
+        if len(messages) > MAX_TURNS + 1:
+            system_msgs = [m for m in messages if m.get("role") == "system"]
+            other_msgs = [m for m in messages if m.get("role") != "system"]
+            messages = system_msgs + other_msgs[-MAX_TURNS:]
+
         return messages
